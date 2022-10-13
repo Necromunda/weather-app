@@ -1,25 +1,40 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
+import Weather from './components/Weather';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [lat, setLat] = useState(0)
+  const [lon, setLon] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        console.log(pos)
+        setLat(pos.coords.latitude)
+        setLon(pos.coords.longitude)
+        setIsLoading(false)
+      }, (err) => {
+        console.log(err)
+        alert("Geolocation failed.")
+      })
+    } else {
+      alert("Turn on geolocation services.")
+    }
+  }, [])
+
+  if (isLoading) {
+    return <p>Loading position...</p>
+  } else {
+    return (
+      <div className='container'>
+        <h3>Your position:</h3>
+        <p>Latitude: {lat.toFixed(3)}</p>
+        <p>Longitude: {lon.toFixed(3)}</p>
+        <Weather lat={lat} lon={lon} />
+      </div>
+    )
+  }
 }
 
 export default App;
